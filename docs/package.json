@@ -1,0 +1,19 @@
+{
+  "name": "raindrop_homepage",
+  "version": "1.0.0",
+  "description": "Home page for Raindrop, intended to be hosted on GitHub Page",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx http-server -c-1 src",
+    "prebuild": "cp src/banner.png src/favicon.ico .",
+    "build": "cleancss -o stylesheet.css src/stylesheet.css && html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o index.html src/index.html",
+    "clean": "rm favicon.ico banner.png index.html stylesheet.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-css-cli": "^5.3.3",
+    "html-minifier": "^4.0.0"
+  }
+}
