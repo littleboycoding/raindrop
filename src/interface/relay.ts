@@ -10,6 +10,7 @@ class Relay extends EventEmitter {
 
   constructor(
     public name: string,
+    public targetPort: string,
     public port: string,
     public adapter: string
   ) {

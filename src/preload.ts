@@ -117,7 +117,10 @@ async function getVariable() {
   return variable;
 }
 
-function settingVariable(key: "name" | "port" | "adapter", prop: string) {
+function settingVariable(
+  key: "name" | "targetPort" | "port" | "adapter",
+  prop: string
+) {
   ipcRenderer.send("setting-variable", key, prop);
 }
 

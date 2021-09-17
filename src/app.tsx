@@ -73,6 +73,7 @@ function useInterfaces(): any[] {
 interface Setting {
   name: string;
   port: string;
+  targetPort: string;
   adapter: string;
 }
 
@@ -115,8 +116,16 @@ function SettingDialogStyled() {
     setSetting(newSetting);
   }
 
+  function handleTargetPortChange(event: any) {
+    const newSetting = { ...setting };
+    newSetting.targetPort = event.target.value;
+
+    setSetting(newSetting);
+  }
+
   function apply() {
     window.electron.settingVariable("port", setting.port);
+    window.electron.settingVariable("targetPort", setting.targetPort);
     window.electron.settingVariable("adapter", setting.adapter);
     ctx.setDialog(null);
   }
@@ -146,6 +155,18 @@ function SettingDialogStyled() {
           placeholder="Port"
           required
           value={setting.port}
+        />
+      </Row>
+      <Row gap={10} justifyContent="space-between">
+        Target{" "}
+        <input
+          onChange={handleTargetPortChange}
+          type="text"
+          pattern="[0-9]"
+          maxLength={5}
+          placeholder="Target port"
+          required
+          value={setting.targetPort}
         />
       </Row>
       <Row gap={10} justifyContent="space-betweet">
@@ -927,8 +948,10 @@ function App() {
     );
 
     const cancel2 = fire.onFoundAddress(async (address: string) => {
-      const { port } = await window.electron.getVariable();
-      let name = await (await fetch(`http://${address}:${port}/name`)).text();
+      const { targetPort } = await window.electron.getVariable();
+      let name = await (
+        await fetch(`http://${address}:${targetPort}/name`)
+      ).text();
 
       setDirectory([...directory, { address: address, name }]);
     });

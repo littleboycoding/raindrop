@@ -17,6 +17,7 @@ let fireBin = "fire";
 const VARIABLE = {
   name: "Anonymous",
   port: "2001",
+  targetPort: "2001",
   adapter: "",
 };
 
@@ -58,6 +59,7 @@ function windowHandler(window: BrowserWindow) {
     ) as typeof VARIABLE;
     VARIABLE.name = setting.name;
     VARIABLE.port = setting.port;
+    VARIABLE.targetPort = setting.targetPort;
     VARIABLE.adapter = setting.adapter;
   } catch (e) {
     writeSetting();
@@ -80,7 +82,12 @@ function windowHandler(window: BrowserWindow) {
   }
   fireBin = checkBin(bin);
 
-  let relay = new Relay(VARIABLE.name, VARIABLE.port, VARIABLE.adapter);
+  let relay = new Relay(
+    VARIABLE.name,
+    VARIABLE.targetPort,
+    VARIABLE.port,
+    VARIABLE.adapter
+  );
   let webContents = window.webContents;
   let scanner: ChildProcessWithoutNullStreams;
 
@@ -101,11 +108,11 @@ function windowHandler(window: BrowserWindow) {
     if (isScanning) return;
     isScanning = true;
 
-    let args = ["--msgpack", "--port", VARIABLE.port];
+    let args = ["--msgpack", "--port", VARIABLE.targetPort];
     if (VARIABLE.adapter) {
       args = [...args, "--dev", VARIABLE.adapter];
     }
-    if (DEV) {
+    if (DEV || process.env.INCLUDED_MYSELF === "true") {
       args = [...args, "--include"];
     }
     scanner = spawn(fireBin, [...args, "scan"]);
@@ -186,7 +193,7 @@ function windowHandler(window: BrowserWindow) {
     const ls = spawn(fireBin, [
       "--msgpack",
       "--port",
-      VARIABLE.port,
+      VARIABLE.targetPort,
       "--name",
       VARIABLE.name,
       "send",
@@ -248,7 +255,7 @@ function windowHandler(window: BrowserWindow) {
 
   ipcMain.on(
     "setting-variable",
-    (_: any, key: "name" | "port" | "adapter", prop: any) => {
+    (_: any, key: "name" | "targetPort" | "port" | "adapter", prop: any) => {
       VARIABLE[key] = prop;
       relay[key] = prop;
 
@@ -263,6 +270,7 @@ function windowHandler(window: BrowserWindow) {
   });
 
   ipcMain.on("close", () => {
+    relay.close();
     app.exit(1);
   });
 }
